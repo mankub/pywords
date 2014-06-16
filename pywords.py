@@ -10,28 +10,43 @@ import sys
 
 # own project modules
 from words import *
+from parser import *
 from quiz import *
+from console import *
 
 
-# prints usage of script
-def usage():
-     print "pywords.py <filename>"
+class ObjectBroker:
+     lc = None
+     par = None
+     con = None
+     quiz = None
+
+     def __init__( self ):
+          self.lc = LanguageContainerReaderWriter.load()
+          self.con = Console( self )
+          self.par = Parser( self )
+          self.quiz = Quiz( self )
+
+     def getParser( self ):
+          return self.par
+
+     def getConsole( self ):
+          return self.con
+
+     def getLanguageContainer( self ):
+          return self.lc
+
+     def getQuiz( self ):
+          return self.quiz
+
+
 
 def main(argv):
+     ob = ObjectBroker()
 
-     if len(argv) == 2:
-          # get first argument
-          path = argv[1]
+     ob.getConsole().main_loop()
 
-          # read and parse input file
-          Parser.readInput( path )
-          Parser.process()
-
-          # start quiz
-          Quiz.start()
-
-     else:
-          usage()
+     LanguageContainerReaderWriter.save( ob.getLanguageContainer() )
 
 
 # calls main if file is runned as a script

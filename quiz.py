@@ -17,44 +17,53 @@ class Quiz():
      Dumb quiz class
      """
 
-     def __init__( self ): pass
+     def _green_str( self, str1 ):
+          return "\033[1;32m\033[40m" + str1 + "\033[0m"
 
-     @staticmethod
-     def start():
+     def _red_str( self, str1 ):
+          return "\033[1;31m\033[40m" + str1 + "\033[0m"
+
+     def __init__( self, ob ):
+          self._ob = ob
+
+     def start( self, lang_from_str, lang_to_str ):
           space = "   "
+          lc = self._ob.getLanguageContainer()
 
-          print "<< quiz >>\n"
+          lang_from = lc.get( lang_from_str )
+          lang_to = lc.get( lang_to_str )
 
-          langs = Languages.getAllNames()
-          print langs
+          print ""
+          print lang_from.getName() + " -> " + lang_to.getName()
+          print ""
 
-          lang_str = raw_input( "select question language: " )
-          Quiz.lang_from = Languages.get( lang_str )
-          lang_str = raw_input( "select answer language: " )
-          Quiz.lang_to = Languages.get( lang_str )
-
-          assert Quiz.lang_from != Quiz.lang_to, "very bad.."
-
-          print "\n" + Quiz.lang_from.getName() + " -> " + Quiz.lang_to.getName() + "\n"
-
-          from_list = Quiz.lang_from.getWords()
+          from_list = lang_from.getWords()
           rand_list = random.sample( range( len(from_list) ), len(from_list) )
           good = 0
+          total = 0
 
           for word_num in rand_list:
                word = from_list[ word_num ]
-               answ = raw_input( space + word + "? " )
-               ww = Quiz.lang_from.getWord( word )
+
+               try:
+                    answ = raw_input( space + word + "? " )
+               except:
+                    break
+
+               ww = lang_from.getWord( word )
 
                if len( answ ) > 0 and ww.isTranslation( answ ):
                     good += 1
-                    print space + "\033[1;32m\033[40m" + "good" + "\033[0m"
+                    print space + self._green_str( "good" ) + "\n"
                else:
-                    print space + "\033[1;31m\033[40m" + "wrong" + "\033[0m" + "\n"
+                    print space + self._red_str("wrong") + "\n"
                     for tr in  ww.getTranslations():
                          print space + "  + " + tr
                print
+               total += 1
 
-          print '\n', good, " / ", len( rand_list ), '\n'
+          print ""
+          print good, " / ", total
+          print ""
 
 
